@@ -1,0 +1,687 @@
+{
+  "name": "Lebanon Tech Hiring Intelligence",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        64
+      ],
+      "id": "1387d6a9-773f-481d-b355-43257706637a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorId": {
+          "__rl": true,
+          "value": "nwua9Gu5YrADL7ZDj",
+          "mode": "list",
+          "cachedResultName": "Google Maps Scraper (compass/crawler-google-places)",
+          "cachedResultUrl": "https://console.apify.com/actors/nwua9Gu5YrADL7ZDj/input"
+        },
+        "customBody": "{\n    \"includeWebResults\": false,\n    \"language\": \"en\",\n    \"locationQuery\": \"Saida, Lebanon\",\n    \"maxCrawledPlacesPerSearch\": 30,\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": false,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeSocialMediaProfiles\": {\n        \"facebooks\": false,\n        \"instagrams\": false,\n        \"tiktoks\": false,\n        \"twitters\": false,\n        \"youtubes\": false\n    },\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"IT company\",\n        \"Software company\",\n        \"Tech startup\",\n        \"Software development company\",\n        \"Programming company\"\n    ],\n    \"skipClosedPlaces\": false\n}",
+        "timeout": {},
+        "memory": 4096
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        64
+      ],
+      "id": "aac7478c-de32-419a-a41f-13f2e5afd6bf",
+      "name": "Run an Actor and get dataset",
+      "credentials": {
+        "apifyApi": {
+          "id": "zmcfTNDD7tVtohna",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "633609f7-ab53-4582-91c1-7d91dd74615f",
+              "name": "company_name",
+              "value": "={{$json[\"title\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "16a1ec0e-50dc-47ec-9141-96d56112895a",
+              "name": "address",
+              "value": "={{$json[\"street\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "1fe020ba-4325-42a7-b2f2-35f1e29464f4",
+              "name": "city",
+              "value": "={{$json[\"city\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "91b89205-dd6a-4741-a65a-173534f97b30",
+              "name": "website",
+              "value": "={{$json[\"website\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "01f9287a-3c7d-428e-ba13-60dfc1c92cee",
+              "name": "phone",
+              "value": "={{$json[\"phone\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "3436dde9-e036-40db-a8ad-bbac90ba1532",
+              "name": "category",
+              "value": "={{$json[\"categories\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "c62932e0-6549-4e78-8c12-486a05c193ff",
+              "name": "rating",
+              "value": "={{$json[\"totalScore\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "ad324756-3b60-4976-94a4-7b101e2ca0d2",
+              "name": "first_collected",
+              "value": "={{$now}}",
+              "type": "string"
+            },
+            {
+              "id": "a47ccc72-db31-4a8c-96b3-3c04286c23fc",
+              "name": "last_checked",
+              "value": "={{$now}}",
+              "type": "string"
+            },
+            {
+              "id": "8433e2f0-f1c7-4d04-bf13-451fb42c71a2",
+              "name": "unique_key",
+              "value": "={{ \n  $json.placeId \n  ? $json.placeId \n  : ($json.website \n      ? $json.website\n          .toLowerCase()\n          .replace(/https?:\\/\\//, '')\n          .replace('www.', '')\n          .split('/')[0]\n      : $json.title.toLowerCase().replace(/\\s+/g, '-')\n    )\n}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        64
+      ],
+      "id": "71731c97-6f25-416d-ba42-ef67c12450e7",
+      "name": "Prepare Company Data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        64
+      ],
+      "id": "d3ee7a96-2182-4459-a041-7763e7a27d69",
+      "name": "Process Companies One by One"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY",
+          "mode": "list",
+          "cachedResultName": "Lebanon Tech Companies ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lebanon_Tech_Companies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "unique_key",
+              "lookupValue": "={{$json.unique_key}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        192
+      ],
+      "id": "170946b4-a80f-4d22-afbb-85b831c0ef09",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s0ITixFyUhj6vEI1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e5aba03a-c2b7-405d-b1db-cae6f1059cf7",
+              "leftValue": "={{ !!$json.unique_key }}",
+              "rightValue": "={{$items().length > 0}}\n",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        928,
+        192
+      ],
+      "id": "12a6a1db-ac50-40d5-a1ba-6ed2c101f736",
+      "name": "🧠 Company Already Exists?"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY",
+          "mode": "list",
+          "cachedResultName": "Lebanon Tech Companies ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lebanon_Tech_Companies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "company_name": "={{ $('Process Companies One by One').item.json.company_name }}",
+            "unique_key": "={{ $('Process Companies One by One').item.json.unique_key }}",
+            "address": "={{ $('Process Companies One by One').item.json.address }}",
+            "city": "={{ $('Process Companies One by One').item.json.city }}",
+            "website": "={{ $('Process Companies One by One').item.json.website }}",
+            "phone": "={{ \"'\" + $('Process Companies One by One').item.json.phone }}\n",
+            "category": "={{ $('Process Companies One by One').item.json.category }}",
+            "rating": "={{ $('Process Companies One by One').item.json.rating }}",
+            "first_collected": "={{ $('Process Companies One by One').item.json.first_collected }}",
+            "last_checked": "={{ $('Process Companies One by One').item.json.last_checked }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "unique_key",
+              "displayName": "unique_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "first_collected",
+              "displayName": "first_collected",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_checked",
+              "displayName": "last_checked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hiring_status",
+              "displayName": "hiring_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "internship",
+              "displayName": "internship",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        416
+      ],
+      "id": "93faba05-f74c-4d25-b934-ee06696d3a5e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s0ITixFyUhj6vEI1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY",
+          "mode": "list",
+          "cachedResultName": "Lebanon Tech Companies ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lebanon_Tech_Companies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ckfUISz4q2ltnZPLz96OwGR3j-69qS-pm93GFpYjRmY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone": "={{ $json.phone }}",
+            "company_name": "={{ $json.company_name }}",
+            "address": "={{ $json.address }}",
+            "unique_key": "={{ $json.unique_key }}",
+            "city": "={{ $json.city }}",
+            "website": "={{ $json.website }}",
+            "category": "={{ $json.category }}",
+            "rating": "={{ $json.rating }}",
+            "last_checked": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "unique_key"
+          ],
+          "schema": [
+            {
+              "id": "unique_key",
+              "displayName": "unique_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "first_collected",
+              "displayName": "first_collected",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_checked",
+              "displayName": "last_checked",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hiring_status",
+              "displayName": "hiring_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "internship",
+              "displayName": "internship",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        448
+      ],
+      "id": "43b3f929-1014-4a1f-ab1c-63e569651ed1",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s0ITixFyUhj6vEI1",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 0.8
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        192
+      ],
+      "id": "b6aeac58-ea7e-461a-a7da-30c3b4e58376",
+      "name": "Wait",
+      "webhookId": "04ebb576-9683-4164-9114-c15ad7865c61"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor and get dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor and get dataset": {
+      "main": [
+        [
+          {
+            "node": "Prepare Company Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Company Data": {
+      "main": [
+        [
+          {
+            "node": "Process Companies One by One",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Companies One by One": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "🧠 Company Already Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 Company Already Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Process Companies One by One",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Process Companies One by One",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "01b65ce1-3366-4f33-a178-9e1821f44e63",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "788588a845777cd319fa9655e4e1b96573b8e9b75b00d24b99a8c8193600abe5"
+  },
+  "id": "ym36Vqm8ImTOshxytdPx4",
+  "tags": []
+}
